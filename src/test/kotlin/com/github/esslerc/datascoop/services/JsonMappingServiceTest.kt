@@ -1,6 +1,8 @@
 package com.github.esslerc.datascoop.services
 
-import com.github.esslerc.datascoop.database.DatabaseConnectionInfo
+import com.github.esslerc.datascoop.domain.DBInfo
+import com.github.esslerc.datascoop.domain.Datasource
+import com.github.esslerc.datascoop.domain.ImportPreset
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -9,11 +11,43 @@ import java.io.File
 import java.io.FileWriter
 import java.nio.file.Paths
 
-class JSONMappingServiceTest {
+class JsonMappingServiceTest {
+
+
+    @Test
+    fun validateFile() {
+        val tempFile = File.createTempFile("temp", ".csv")
+
+        val actual = JsonMappingService.validateFile(tempFile)
+
+        assertEquals(true, actual)
+
+        tempFile.delete()
+    }
+
+    @Test
+    fun validateFile_wrongSuffix() {
+        val tempFile = File.createTempFile("temp", ".txt")
+
+        val actual = JsonMappingService.validateFile(tempFile)
+
+        assertEquals(false, actual)
+
+        tempFile.delete()
+    }
+
+
+
+    @Test
+    fun validateFile_noFile() {
+        val actual = JsonMappingService.validateFile(Paths.get("unkown").toFile())
+
+        assertEquals(false, actual)
+    }
 
     @Test
     fun loadJSON() {
-        val jsonMappingService = JSONMappingService()
+        val jsonMappingService = JsonMappingService()
 
         val content =
             """
@@ -39,21 +73,21 @@ class JSONMappingServiceTest {
                 "url": "",
                 "username": "root",
                 "password": "password",
-                "driver-class-name": ""
+                "table-name": "table1"
               }
             }
             """.trimIndent()
 
-        val file = writeJSONContent(content)
+        val file = writeJsonContent(content)
 
         val importPreset = jsonMappingService.loadJSON(file)
 
         val expectedImportPreset = ImportPreset(
-            databaseConnectionInfo = DatabaseConnectionInfo(
-                url = "",
+            dbInfo = DBInfo(
+                jdbcUrl = "",
                 username = "root",
                 password = "password",
-                driverClassName = ""
+                tableName = "table1",
             )
         ).also {
             val datasource1 = Datasource()
@@ -73,7 +107,7 @@ class JSONMappingServiceTest {
         assertEquals(expectedImportPreset, importPreset)
     }
 
-    private fun writeJSONContent(content: String): File {
+    private fun writeJsonContent(content: String): File {
         val tempFile = File.createTempFile("test", ".json")
         BufferedWriter(FileWriter(tempFile)).use {
             it.write(content)
