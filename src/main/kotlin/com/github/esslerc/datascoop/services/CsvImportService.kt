@@ -4,37 +4,42 @@ import com.fasterxml.jackson.databind.MappingIterator
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.fasterxml.jackson.dataformat.csv.CsvSchema.ColumnType
+import com.github.esslerc.datascoop.domain.DBInfo
+import com.github.esslerc.datascoop.domain.Datasource
+import com.github.esslerc.datascoop.domain.ImportPreset
 import org.apache.commons.io.input.BOMInputStream
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.nio.file.Files
 
 class CsvImportService(
-    private val jsonMappingService: JSONMappingService,
     private val databaseService: PGDatabaseService
 ) {
 
-    fun import(mappingFile: File) {
-        val importPreset = jsonMappingService.loadJSON(mappingFile)
+    fun import(importPreset: ImportPreset) {
+        logger.info("Start import for ${importPreset.datasources.size} datasource")
 
-        val databaseClient = databaseService.getClient(importPreset.databaseConnectionInfo)
+        val dbInfo = importPreset.dbInfo
 
         importPreset.datasources.forEach { datasource ->
-            importDataFromDatasource(datasource, databaseClient)
+            importFromDatasource(datasource, dbInfo)
         }
+
+        logger.info("Import for ${importPreset.datasources.size} datasource finished")
     }
 
-    private fun importDataFromDatasource(datasource: Datasource, databaseClient: Unit) {
+    private fun importFromDatasource(datasource: Datasource, dbInfo: DBInfo) {
+        val csvMapping = datasource.csvMapping
+        val csvEncoding = datasource.csvEncoding
+
+        databaseService.dropTable(dbInfo)
+        databaseService.createTable(dbInfo, csvMapping)
+
         val filesToImport = datasource.csvFiles
 
         filesToImport.forEach { csvFile ->
             val csvMapper = CsvMapper()
-
-            val csvMapping = datasource.csvMapping
-            val csvEncoding = datasource.csvEncoding
 
             val csvSchemaBuilder = CsvSchema.builder()
 
@@ -59,40 +64,22 @@ class CsvImportService(
                         .with(csvSchema)
                         .readValues(inputStreamReader)
 
-                while (mappingIterator.hasNext()) {
-                    val row = mappingIterator.next()
-                    logger.info(row.toString())
-                    // hier muss was mit databaseClient passieren
-                }
+                databaseService.insert(dbInfo, csvMapping, mappingIterator)
             }
-
         }
     }
 
-    private fun getJacksonColumnType(csvColumnType: String) =
+    fun getJacksonColumnType(csvColumnType: String) =
         when(csvColumnType.lowercase()) {
             "string" -> ColumnType.STRING
             "int" -> ColumnType.NUMBER
             "boolean" -> ColumnType.BOOLEAN
             "double" -> ColumnType.NUMBER
-            else -> throw IllegalArgumentException("Unkown csvColumnType $csvColumnType")
+            else -> throw IllegalArgumentException("unknown csvColumnType $csvColumnType")
         }
 
 
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(CsvImportService::class.java)
-
-        fun validateFile(file: File, suffix: String = "csv") : Boolean {
-            val fileExists = file.exists()
-            logger.info("Check file exists: $fileExists")
-
-            val isRegularFile = Files.isRegularFile(file.toPath())
-            logger.info("Check is regular file: $isRegularFile")
-
-            val isValidSuffix = file.extension.lowercase() == suffix.lowercase()
-            logger.info("Check is valid suffix: $isRegularFile")
-
-            return fileExists && isRegularFile && isValidSuffix
-        }
     }
 }
