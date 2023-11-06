@@ -49,8 +49,7 @@ class PGDatabaseService {
                             for ((index, columnName) in mapping.keys.withIndex()) {
                                 val columnType = mapping[columnName]
                                     ?: throw IllegalArgumentException("Unknown column type for column $columnName")
-                                val columnValue = map[columnName]
-                                    ?: throw IllegalArgumentException("Value for column $columnName is missing")
+                                val columnValue = map[columnName]?.trim()
                                 setPreparedStatementParameter(preparedStatement, index + 1, columnType, columnValue)
                             }
                             preparedStatement.addBatch()
@@ -68,24 +67,35 @@ class PGDatabaseService {
         preparedStatement: PreparedStatement,
         index: Int,
         columnType: String,
-        columnValue: String
+        columnValue: String?
     ) {
-        when (columnType.lowercase()) {
-            "string" -> preparedStatement.setString(index, columnValue)
-            "int" -> preparedStatement.setInt(index, columnValue.toInt())
-            "boolean" -> preparedStatement.setBoolean(index, columnValue.toBoolean())
-            "double" -> preparedStatement.setBigDecimal(index, columnValue.toBigDecimal())
-            else -> throw IllegalArgumentException("Unknown PGColumnType $columnType")
+        if(columnValue.isNullOrBlank()) {
+            preparedStatement.setNull(index, getSQLType(columnType))
+        } else {
+            when (columnType.lowercase()) {
+                "string" -> preparedStatement.setString(index, columnValue)
+                "int" -> preparedStatement.setInt(index, columnValue.toInt())
+                "boolean" -> preparedStatement.setBoolean(index, columnValue.toBoolean())
+                "double" -> preparedStatement.setBigDecimal(index, columnValue.toBigDecimal())
+                else -> throw IllegalArgumentException("Unknown PGColumnType $columnType")
+            }
         }
     }
 
-
     private fun getPGDatatype(pgColumnType: String) = when (pgColumnType.lowercase()) {
         "string" -> "VARCHAR"
-        "int" -> "BIGINT"
+        "int" -> "INTEGER"
         "boolean" -> "BOOLEAN"
         "double" -> "NUMERIC(16,4)"
         else -> throw IllegalArgumentException("Unknown PGColumnType $pgColumnType")
+    }
+
+    private fun getSQLType(columnType: String) = when (columnType.lowercase()) {
+        "string" -> java.sql.Types.VARCHAR
+        "int" -> java.sql.Types.INTEGER
+        "boolean" -> java.sql.Types.BOOLEAN
+        "double" -> java.sql.Types.NUMERIC
+        else -> throw IllegalArgumentException("Unknown PGColumnType $columnType")
     }
 
     private fun getConnection(dbInfo: DBInfo): Connection {
