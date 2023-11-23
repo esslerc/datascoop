@@ -3,10 +3,10 @@ package com.github.esslerc.datascoop.services
 import com.fasterxml.jackson.databind.MappingIterator
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
-import com.fasterxml.jackson.dataformat.csv.CsvSchema.ColumnType
 import com.github.esslerc.datascoop.domain.DBInfo
 import com.github.esslerc.datascoop.domain.Datasource
 import com.github.esslerc.datascoop.domain.ImportPreset
+import com.github.esslerc.datascoop.domain.ScoopColumnType
 import org.apache.commons.io.input.BOMInputStream
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,7 +14,7 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 
 class CsvImportService(
-    private val databaseService: PGDatabaseService
+    private val databaseService: PGDatabaseService,
 ) {
 
     fun import(importPreset: ImportPreset) {
@@ -44,7 +44,7 @@ class CsvImportService(
             val csvSchemaBuilder = CsvSchema.builder()
 
             csvMapping.forEach { (columnName, columnType) ->
-                csvSchemaBuilder.addColumn(columnName, getJacksonColumnType(columnType))
+                csvSchemaBuilder.addColumn(columnName, ScoopColumnType.forValue(columnType).jacksonCsvType)
             }
             csvSchemaBuilder.setColumnSeparator(datasource.csvSeparator)
             csvSchemaBuilder.setSkipFirstDataRow(datasource.csvHeader)
@@ -68,16 +68,6 @@ class CsvImportService(
             }
         }
     }
-
-    fun getJacksonColumnType(csvColumnType: String) =
-        when(csvColumnType.lowercase()) {
-            "string" -> ColumnType.STRING
-            "int" -> ColumnType.NUMBER
-            "boolean" -> ColumnType.BOOLEAN
-            "double" -> ColumnType.NUMBER
-            else -> throw IllegalArgumentException("unknown csvColumnType $csvColumnType")
-        }
-
 
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(CsvImportService::class.java)

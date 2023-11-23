@@ -1,11 +1,9 @@
 package com.github.esslerc.datascoop.services
 
-import com.fasterxml.jackson.dataformat.csv.CsvSchema.ColumnType
 import com.github.esslerc.datascoop.domain.DBInfo
 import com.github.esslerc.datascoop.domain.Datasource
 import com.github.esslerc.datascoop.domain.ImportPreset
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -45,19 +43,6 @@ class CsvImportServiceTest {
         verify(databaseService, times(1)).createTable(any(), any())
         verify(databaseService, times(importPreset.datasources.size)).insert(any(), any(), any()
         )
-    }
-
-    @Test
-    fun testGetJacksonColumnType() {
-        val stringType = csvImportService.getJacksonColumnType("string")
-        val intType = csvImportService.getJacksonColumnType("int")
-        val booleanType = csvImportService.getJacksonColumnType("boolean")
-        val doubleType = csvImportService.getJacksonColumnType("double")
-
-        assertEquals(ColumnType.STRING, stringType)
-        assertEquals(ColumnType.NUMBER, intType)
-        assertEquals(ColumnType.BOOLEAN, booleanType)
-        assertEquals(ColumnType.NUMBER, doubleType)
     }
 
     private fun createMockImportPreset(): ImportPreset {
