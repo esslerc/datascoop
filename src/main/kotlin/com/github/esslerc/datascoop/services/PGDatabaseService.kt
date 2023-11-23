@@ -2,6 +2,7 @@ package com.github.esslerc.datascoop.services
 
 import com.fasterxml.jackson.databind.MappingIterator
 import com.github.esslerc.datascoop.domain.DBInfo
+import com.github.esslerc.datascoop.domain.ScoopColumnType
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.PreparedStatement
@@ -23,7 +24,7 @@ class PGDatabaseService {
     fun createTable(dbInfo: DBInfo, mapping: Map<String, String>) {
         getConnection(dbInfo).use { connection ->
             val columnDefinitions = mapping.entries.joinToString(", ") { (columnName, columnType) ->
-                "$columnName ${getPGDatatype(columnType)}"
+                "$columnName ${ScoopColumnType.forValue(columnType).pgType}"
             }
             val sql = "CREATE TABLE ${dbInfo.tableName} (id SERIAL PRIMARY KEY, $columnDefinitions)"
             connection.createStatement().use { statement ->
@@ -67,10 +68,10 @@ class PGDatabaseService {
         preparedStatement: PreparedStatement,
         index: Int,
         columnType: String,
-        columnValue: String?
+        columnValue: String?,
     ) {
         if(columnValue.isNullOrBlank()) {
-            preparedStatement.setNull(index, getSQLType(columnType))
+            preparedStatement.setNull(index, ScoopColumnType.forValue(columnType).sqlType)
         } else {
             when (columnType.lowercase()) {
                 "string" -> preparedStatement.setString(index, columnValue)
@@ -80,22 +81,6 @@ class PGDatabaseService {
                 else -> throw IllegalArgumentException("Unknown PGColumnType $columnType")
             }
         }
-    }
-
-    private fun getPGDatatype(pgColumnType: String) = when (pgColumnType.lowercase()) {
-        "string" -> "VARCHAR"
-        "int" -> "INTEGER"
-        "boolean" -> "BOOLEAN"
-        "double" -> "NUMERIC(16,4)"
-        else -> throw IllegalArgumentException("Unknown PGColumnType $pgColumnType")
-    }
-
-    private fun getSQLType(columnType: String) = when (columnType.lowercase()) {
-        "string" -> java.sql.Types.VARCHAR
-        "int" -> java.sql.Types.INTEGER
-        "boolean" -> java.sql.Types.BOOLEAN
-        "double" -> java.sql.Types.NUMERIC
-        else -> throw IllegalArgumentException("Unknown PGColumnType $columnType")
     }
 
     private fun getConnection(dbInfo: DBInfo): Connection {

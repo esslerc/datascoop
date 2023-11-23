@@ -8,5 +8,5 @@ data class Datasource(
     var csvSeparator: Char = ';',
     var csvHeader: Boolean = true,
     var csvEncoding: Charset = Charsets.UTF_8,
-    val csvMapping: MutableMap<String, String> = mutableMapOf()
+    val csvMapping: MutableMap<String, String> = mutableMapOf(),
 )
