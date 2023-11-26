@@ -11,13 +11,13 @@ enum class ScoopColumnType (
     STRING_COLUMN_TYPE(CsvSchema.ColumnType.STRING, Types.VARCHAR, "VARCHAR"),
     INT_COLUMN_TYPE(CsvSchema.ColumnType.NUMBER, Types.INTEGER, "INTEGER"),
     BOOLEAN_COLUMN_TYPE(CsvSchema.ColumnType.BOOLEAN, Types.BOOLEAN, "BOOLEAN"),
-    NUMERIC_COLUMN_TYPE(CsvSchema.ColumnType.NUMBER, Types.NUMERIC, "NUMERIC(16,4)");
+    NUMERIC_COLUMN_TYPE(CsvSchema.ColumnType.NUMBER, Types.NUMERIC, "NUMERIC");
 
     companion object {
         fun forValue(value: String) =
             when (value.lowercase()) {
-                "string" -> STRING_COLUMN_TYPE
-                "int" -> INT_COLUMN_TYPE
+                "text" -> STRING_COLUMN_TYPE
+                "integer" -> INT_COLUMN_TYPE
                 "boolean" -> BOOLEAN_COLUMN_TYPE
                 "double" -> NUMERIC_COLUMN_TYPE
                 else -> throw IllegalArgumentException("unknown csvColumnType $value")
