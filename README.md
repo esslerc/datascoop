@@ -22,10 +22,12 @@ An example for an import preset file would be:
       "csv-header": true,
       "csv-encoding": "UTF-8",
       "csv-mapping": {
-        "Name": "String",
-        "Age": "Int",
-        "City": "String",
-        "Email": "String"
+        "Name": "text",
+        "Age": "integer",
+        "City": "text",
+        "Email": "text",
+        "Salary": "float",
+        "Active": "boolean"
       }
     }
   },
@@ -40,22 +42,27 @@ An example for an import preset file would be:
 A corresponding CSV file would be (data was generated):
 
 ```csv
-Name,Age,City,Email
-YeQozaDy,29,eounRu,YwJJhSNNTq@example.com
-YCKZxzFx,48,ShshaK,hQHsaNMgMe@example.com
-rBOEiXgw,51,efpiYC,NeTnCWFmgV@example.com
-ahNSBbIE,57,PIQuqu,IKsyyRRqZF@example.com
-Yittxgos,39,aPwaYG,OVAQaJEvLv@example.com
-NfswvjXg,40,UawAKa,aRcZMcCoVP@example.com
-OLvYmYts,41,euVZfg,JWoLrrcXCN@example.com
-KmdcEgnM,29,yEITIj,atRavRyyoy@example.com
-TZGcKNsM,50,kGyYox,ckyHfEomUj@example.com
-tGHOSuqR,53,XeDmIE,ZfRZjoKtHX@example.com
-wAnCRXel,43,rthHKK,AdPTxINYpX@example.com
-huOoCjzw,65,xxEeIi,kuyltpBRNC@example.com
-WcNPBUOv,38,ncFTdB,GnHjnGurAc@example.com
-
+Name,Age,City,Email,Salary,Active
+fnvpUxID,59,wbvdVd,sBSIMENdSG@example.com,3216.54,True
+bClkrBnT,52,lDpIkT,HxeZJGxndY@example.com,2837.87,True
+XSvpCdbm,26,ieApnz,JpFPSzVczJ@example.com,3109.29,True
+mmZlkWvB,54,TvjQCK,HSBxUNTMOr@example.com,1802.94,True
+CJNTOZtB,31,tGanpg,UGxhgbINuZ@example.com,3222.58,False
+phWMCYSZ,18,StcWnh,UxLyCkNhSK@example.com,2656.52,False
+iCeMWXct,56,saZhxa,XeUlIqhWpE@example.com,3024.28,True
+vLKLEjZQ,48,RtyCDE,tnXLeZdlpp@example.com,2945.15,True
+NvxqUUua,51,WAwOrX,TXufqTyLIq@example.com,3741.78,True
 ```
+### Data Types
+The following data types can be used in the import preset file:
+
+| Data Type | Description                                                                                                                                    |
+|-----------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| text      | This is the most universal data type. It can either be a simple text or a column that cannot be parsed or represented by the other data types. |
+| integer   | A number without a decimal place                                                                                                               |
+| float     | A number with a decimal place                                                                                                                  |
+| boolean   | A bool value can either be True, False or empty                                                                                                |
+
 
 ## Build and Run
 You can either create and run the project with your own gradle version or with the gradlew wrapper which comes with this project. 
