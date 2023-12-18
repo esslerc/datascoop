@@ -74,7 +74,7 @@ class PGDatabaseService {
             preparedStatement.setNull(index, ScoopColumnType.forValue(columnType).sqlType)
         } else {
             when (columnType.lowercase()) {
-                "string" -> preparedStatement.setString(index, columnValue)
+                "text" -> preparedStatement.setString(index, columnValue)
                 "int" -> preparedStatement.setInt(index, columnValue.toInt())
                 "boolean" -> preparedStatement.setBoolean(index, columnValue.toBoolean())
                 "double" -> preparedStatement.setBigDecimal(index, columnValue.toBigDecimal())
