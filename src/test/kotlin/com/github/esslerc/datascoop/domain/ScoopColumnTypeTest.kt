@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test
 class ScoopColumnTypeTest {
     @Test
     fun testGetJacksonColumnType() {
-        val stringType = ScoopColumnType.forValue("string")
-        val intType = ScoopColumnType.forValue("int")
+        val stringType = ScoopColumnType.forValue("text")
+        val intType = ScoopColumnType.forValue("integer")
         val booleanType = ScoopColumnType.forValue("boolean")
         val doubleType = ScoopColumnType.forValue("double")
 
@@ -20,21 +20,21 @@ class ScoopColumnTypeTest {
 
     @Test
     fun testGetPGColumnType() {
-        val stringType = ScoopColumnType.forValue("string")
-        val intType = ScoopColumnType.forValue("int")
+        val stringType = ScoopColumnType.forValue("text")
+        val intType = ScoopColumnType.forValue("integer")
         val booleanType = ScoopColumnType.forValue("boolean")
         val doubleType = ScoopColumnType.forValue("double")
 
         assertEquals("VARCHAR", stringType.pgType)
         assertEquals("INTEGER", intType.pgType)
         assertEquals("BOOLEAN", booleanType.pgType)
-        assertEquals("NUMERIC(16,4)", doubleType.pgType)
+        assertEquals("NUMERIC", doubleType.pgType)
     }
 
     @Test
     fun testGetSQLColumnType() {
-        val stringType = ScoopColumnType.forValue("string")
-        val intType = ScoopColumnType.forValue("int")
+        val stringType = ScoopColumnType.forValue("text")
+        val intType = ScoopColumnType.forValue("integer")
         val booleanType = ScoopColumnType.forValue("boolean")
         val doubleType = ScoopColumnType.forValue("double")
 

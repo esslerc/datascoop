@@ -65,10 +65,10 @@ class CsvImportServiceTest {
                 Datasource(
                     csvFiles = mutableListOf(tempFile),
                     csvMapping = mutableMapOf(
-                        "Name" to "String",
-                        "Age" to "Int",
-                        "City" to "String",
-                        "Email" to "String",
+                        "Name" to "text",
+                        "Age" to "integer",
+                        "City" to "text",
+                        "Email" to "text",
                     ),
                 )
             ),

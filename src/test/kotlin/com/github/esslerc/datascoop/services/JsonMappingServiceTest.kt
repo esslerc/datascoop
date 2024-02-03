@@ -62,10 +62,10 @@ class JsonMappingServiceTest {
                   "csv-header": true,
                   "csv-encoding": "UTF-8",
                   "csv-mapping": {
-                    "Name": "String",
-                    "Age": "Int",
-                    "City": "String",
-                    "Email": "String"
+                    "Name": "text",
+                    "Age": "integer",
+                    "City": "text",
+                    "Email": "text"
                   }
                 }
               },
@@ -96,10 +96,10 @@ class JsonMappingServiceTest {
             datasource1.csvSeparator = ','
             datasource1.csvHeader = true
             datasource1.csvEncoding = Charsets.UTF_8
-            datasource1.csvMapping["Name"] = "String"
-            datasource1.csvMapping["Age"] = "Int"
-            datasource1.csvMapping["City"] = "String"
-            datasource1.csvMapping["Email"] = "String"
+            datasource1.csvMapping["Name"] = "text"
+            datasource1.csvMapping["Age"] = "integer"
+            datasource1.csvMapping["City"] = "text"
+            datasource1.csvMapping["Email"] = "text"
 
             it.datasources.add(datasource1)
         }
